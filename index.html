@@ -9,28 +9,85 @@
       body {
         display: flex;
         flex-direction: column;
-        justify-content: ;
+        background-color: #368ca9;
       }
       .heading {
-        text-align: center;
-        font-family: "Sans-serif", Courier, monospace;
-        background-color: #ffca28;
+        display: flex;
+        justify-content: space-between;
+        font-family: "Arial", Courier, monospace;
+        background-color: #368ca9;
         width: 100%;
-        padding: 2px;
+        color: white;
+        padding: 10px;
+        flex-wrap: wrap;
+      }
+      p.heading-text {
+        font-weight: bold;
+        font-size: 30px;
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        padding: 5px;
       }
       .footer {
         position: fixed;
         bottom: 0;
-        color: black;
-        background-color: #ffca28;
+        color: white;
+        background-color: #024359;
         width: 100%;
         padding: 9px;
         text-align: right;
       }
       .mid {
         display: flex;
-        justify-content: center;
+        justify-content: left;
+
+        padding: 10px;
+      }
+      .location {
+        padding: 5px;
+        border: 3px solid #024359;
+        border-radius: 5px;
+        background-color: #024359;
+        display: flex;
         align-items: center;
+        justify-content: center;
+      }
+      .location > span {
+        margin-left: 5px;
+      }
+      .mid__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .mid__row:nth-of-type(1) {
+        justify-content: flex-end;
+      }
+      .mid__row:nth-of-type(1) > div > img {
+        margin-right: 5px;
+      }
+      .content {
+        background-color: white;
+        border: 3px solid white;
+        border-radius: 5px;
+        width: 90%;
+        max-width: 400px;
+        padding: 20px;
+      }
+      .convertButton {
+        padding: 10px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .convertButton > button {
+        margin-left: 10px;
+      }
+      .sun {
+        display: flex;
+        align-items: center;
+      }
+      .selected {
+        border: 2px solid rgb(183, 206, 161) !important;
       }
     </style>
     <!-- Compiled and minified CSS -->
@@ -49,37 +106,80 @@
 
   <body>
     <div class="heading">
-      <h1>WEATHER TODAY!!</h1>
-    </div>
-    <div class="mid">
-      <div class="content">
-        <p>City: <span id="city"></span></p>
-        <p>Temperature: <span id="temp"></span></p>
-        <p>Feels Like: <span id="feelTemp"></span></p>
-        <p>Min Temperature: <span id="minTemp"></span></p>
-        <p>Max Temperature: <span id="maxTemp"></span></p>
-        <div>
+      <div class="heading__left">
+        <p class="heading-text">The Weather Channel</p>
+        <div class="location">
+          <i class="tiny material-icons">location_on</i>
+
+          <span> <span id="city"></span>, <span id="country"></span> </span>
+        </div>
+      </div>
+
+      <div class="heading__right">
+        <div class="convertButton">
           <button
             id="convertToF"
-            class="btn-small waves-effect waves-light blue accent-2"
+            class="btn-floating waves-effect waves-light amber"
           >
-            <i class="material-icons left">cloud</i>
-            Change To F
+            °F
           </button>
 
           <button
             id="convertToC"
-            class="btn-small waves-effect waves-light blue accent-2"
+            class="btn-floating waves-effect waves-light green selected"
           >
-            <i class="material-icons left">cloud</i>
-            Change To C
+            °C
           </button>
+        </div>
+
+        <div class="sun">
+          <img src="./images/sunrise.png" width="40px" height="40px" />
+          <span id="sunrise"></span>
+
+          <img src="./images/sunset.png" width="40px" height="40px" />
+          <span id="sunset"></span>
+        </div>
+      </div>
+    </div>
+    <div class="mid">
+      <div class="content">
+        <div class="mid__row">
+          <div>
+            <img id="weatherIcon" />
+          </div>
+          <div>
+            <span id="weatherCondition"></span>
+          </div>
+        </div>
+        <div class="mid__row">
+          <div>Temperature:</div>
+          <div id="temp"></div>
+        </div>
+        <div class="mid__row">
+          <div>Feels Like:</div>
+          <div id="feelTemp"></div>
+        </div>
+        <div class="mid__row">
+          <div>Min Temperature:</div>
+          <div id="minTemp"></div>
+        </div>
+        <div class="mid__row">
+          <div>Max Temperature:</div>
+          <div id="maxTemp"></div>
+        </div>
+        <div class="mid__row">
+          <div>Pressure:</div>
+          <div id="pressure"></div>
+        </div>
+        <div class="mid__row">
+          <div>Humidity:</div>
+          <div id="humidity"></div>
         </div>
       </div>
     </div>
 
     <footer class="footer">
-      <div class="footer-copyright">© 2021 Nisha Shahi Weather</div>
+      <div class="footer-copyright">© 2021 Nisha Shahi</div>
     </footer>
     <script>
       window.addEventListener("DOMContentLoaded", () => {
@@ -88,7 +188,9 @@
           latitude: 37.3057,
           longitude: -89.5181,
         };
-        let unit = "C";
+        let unit = "°C";
+        let iconUrl;
+        let buttons = document.querySelectorAll(".convertButton button");
 
         //methods
         const updateWeatherInfo = () => {
@@ -100,22 +202,43 @@
             .then((data) => {
               console.log(data);
               document.getElementById("temp").innerHTML =
-                unit === "C"
-                  ? data.main.temp - 273.15 + unit
-                  : ((data.main.temp - 273.15) * 9) / 5 + 32 + unit;
+                unit === "°C"
+                  ? (data.main.temp - 273.15).toFixed(2) + unit
+                  : (((data.main.temp - 273.15) * 9) / 5 + 32).toFixed(2) +
+                    unit;
               document.getElementById("feelTemp").innerHTML =
-                unit === "C"
-                  ? data.main.feels_like - 273.15 + unit
-                  : ((data.main.feels_like - 273.15) * 9) / 5 + 32 + unit;
+                unit === "°C"
+                  ? (data.main.feels_like - 273.15).toFixed(2) + unit
+                  : (((data.main.feels_like - 273.15) * 9) / 5 + 32).toFixed(
+                      2
+                    ) + unit;
               document.getElementById("minTemp").innerHTML =
-                unit === "C"
-                  ? data.main.temp_min - 273.15 + unit
-                  : ((data.main.temp_min - 273.15) * 9) / 5 + 32 + unit;
+                unit === "°C"
+                  ? (data.main.temp_min - 273.15).toFixed(2) + unit
+                  : (((data.main.temp_min - 273.15) * 9) / 5 + 32).toFixed(2) +
+                    unit;
               document.getElementById("maxTemp").innerHTML =
-                unit === "C"
-                  ? data.main.temp_max - 273.15 + unit
-                  : ((data.main.temp_max - 273.15) * 9) / 5 + 32 + unit;
+                unit === "°C"
+                  ? (data.main.temp_max - 273.15).toFixed(2) + unit
+                  : (((data.main.temp_max - 273.15) * 9) / 5 + 32).toFixed(2) +
+                    unit;
+              document.getElementById("country").innerHTML = data.sys.country;
+              document.getElementById("sunrise").innerHTML = new Date(
+                data.sys.sunrise * 1000
+              ).toLocaleTimeString();
+              document.getElementById("sunset").innerHTML = new Date(
+                data.sys.sunset * 1000
+              ).toLocaleTimeString();
               document.getElementById("city").innerHTML = data.name;
+              document.getElementById("pressure").innerHTML =
+                data.main.pressure;
+              document.getElementById("humidity").innerHTML =
+                data.main.humidity;
+              document.getElementById("weatherCondition").innerHTML =
+                data.weather[0].description;
+              document.getElementById(
+                "weatherIcon"
+              ).src = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
             });
         };
         const getUserLocation = () => {
@@ -131,12 +254,25 @@
           navigator.geolocation.getCurrentPosition(success, error);
         };
         const convertToFahrenheit = () => {
-          unit = "F";
+          unit = "°F";
+          buttons[0].classList.remove("amber");
+          buttons[0].classList.add("green");
+          buttons[1].classList.remove("green");
+          buttons[1].classList.add("amber");
+          buttons[0].classList.add("selected");
+          buttons[1].classList.remove("selected");
           updateWeatherInfo();
         };
 
         const convertToCelcius = () => {
           unit = "C";
+          buttons[1].classList.remove("amber");
+          buttons[1].classList.add("green");
+          buttons[0].classList.remove("green");
+          buttons[0].classList.add("amber");
+          buttons[0].classList.remove("selected");
+
+          buttons[1].classList.add("selected");
           updateWeatherInfo();
         };
 
