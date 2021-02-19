@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Today!</title>
+  </head>
+  <body>
+    <div>
+      <p>City:<span id="city"></span></p>
+      <p>Temperature:<span id="temp"></span></p>
+      <p>Feels Like:<span id="feelTemp"></span></p>
+      <p>Min Temperature:<span id="minTemp"></span></p>
+      <p>Max Temperature:<span id="maxTemp"></span></p>
+    </div>
+    <div>
+      <button id="convertToF">Change To F</button>
+      <button id="convertToC">Change To C</button>
+    </div>
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        //variables
+        let pos = {
+          latitude: 37.3057,
+          longitude: -89.5181,
+        };
+        let unit = "C";
+
+        //methods
+        const updateWeatherInfo = () => {
+          fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${pos.latitude}&lon=${pos.longitude}&appid=38ac9123d59fb0b8574ce25ee74ce0c0
+        `
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              document.getElementById("temp").innerHTML =
+                unit === "C"
+                  ? data.main.temp - 273.15 + unit
+                  : ((data.main.temp - 273.15) * 9) / 5 + 32 + unit;
+              document.getElementById("feelTemp").innerHTML =
+                unit === "C"
+                  ? data.main.feels_like - 273.15 + unit
+                  : ((data.main.feels_like - 273.15) * 9) / 5 + 32 + unit;
+              document.getElementById("minTemp").innerHTML =
+                unit === "C"
+                  ? data.main.temp_min - 273.15 + unit
+                  : ((data.main.temp_min - 273.15) * 9) / 5 + 32 + unit;
+              document.getElementById("maxTemp").innerHTML =
+                unit === "C"
+                  ? data.main.temp_max - 273.15 + unit
+                  : ((data.main.temp_max - 273.15) * 9) / 5 + 32 + unit;
+              document.getElementById("city").innerHTML = data.name;
+            });
+        };
+        const getUserLocation = () => {
+          const success = (p) => {
+            console.log(p);
+            pos.latitude = p.coords.latitude;
+            pos.longitude = p.coords.longitude;
+            updateWeatherInfo();
+          };
+          const error = (err) => {
+            console.log(err);
+          };
+          navigator.geolocation.getCurrentPosition(success, error);
+        };
+        const convertToFahrenheit = () => {
+          unit = "F";
+          updateWeatherInfo();
+        };
+
+        const convertToCelcius = () => {
+          unit = "C";
+          updateWeatherInfo();
+        };
+
+        //Event listeners
+        document
+          .getElementById("convertToF")
+          .addEventListener("click", convertToFahrenheit);
+        document
+          .getElementById("convertToC")
+          .addEventListener("click", convertToCelcius);
+        //script
+        getUserLocation();
+      });
+    </script>
+  </body>
+</html>
