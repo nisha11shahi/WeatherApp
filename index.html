@@ -52,6 +52,9 @@
         align-items: center;
         justify-content: center;
       }
+      #temp {
+        font-size: 70px;
+      }
       .location > span {
         margin-left: 5px;
       }
@@ -60,10 +63,10 @@
         align-items: center;
         justify-content: space-between;
       }
-      .mid__row:nth-of-type(1) {
+      .mid__row--centered {
         justify-content: flex-end;
       }
-      .mid__row:nth-of-type(1) > div > img {
+      .mid__row--centered > div > img {
         margin-right: 5px;
       }
       .content {
@@ -89,6 +92,9 @@
       .selected {
         border: 2px solid rgb(183, 206, 161) !important;
       }
+      .accessTime {
+        margin-left: 10px;
+      }
     </style>
     <!-- Compiled and minified CSS -->
     <link
@@ -112,6 +118,8 @@
           <i class="tiny material-icons">location_on</i>
 
           <span> <span id="city"></span>, <span id="country"></span> </span>
+          <i class="tiny material-icons accessTime">access_time</i>
+          <span id="currentTime"></span>
         </div>
       </div>
 
@@ -143,7 +151,8 @@
     </div>
     <div class="mid">
       <div class="content">
-        <div class="mid__row">
+        <div class="mid__row"><div id="temp"></div></div>
+        <div class="mid__row mid__row--centered">
           <div>
             <img id="weatherIcon" />
           </div>
@@ -151,10 +160,7 @@
             <span id="weatherCondition"></span>
           </div>
         </div>
-        <div class="mid__row">
-          <div>Temperature:</div>
-          <div id="temp"></div>
-        </div>
+
         <div class="mid__row">
           <div>Feels Like:</div>
           <div id="feelTemp"></div>
@@ -226,14 +232,17 @@
               document.getElementById("sunrise").innerHTML = new Date(
                 data.sys.sunrise * 1000
               ).toLocaleTimeString();
+              document.getElementById("currentTime").innerHTML = new Date(
+                data.dt * 1000
+              ).toLocaleTimeString();
               document.getElementById("sunset").innerHTML = new Date(
                 data.sys.sunset * 1000
               ).toLocaleTimeString();
               document.getElementById("city").innerHTML = data.name;
               document.getElementById("pressure").innerHTML =
-                data.main.pressure;
+                data.main.pressure + " hPa";
               document.getElementById("humidity").innerHTML =
-                data.main.humidity;
+                data.main.humidity + "%";
               document.getElementById("weatherCondition").innerHTML =
                 data.weather[0].description;
               document.getElementById(
@@ -265,13 +274,12 @@
         };
 
         const convertToCelcius = () => {
-          unit = "C";
+          unit = "°C";
           buttons[1].classList.remove("amber");
           buttons[1].classList.add("green");
           buttons[0].classList.remove("green");
           buttons[0].classList.add("amber");
           buttons[0].classList.remove("selected");
-
           buttons[1].classList.add("selected");
           updateWeatherInfo();
         };
