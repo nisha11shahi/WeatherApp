@@ -232,9 +232,7 @@
               document.getElementById("sunrise").innerHTML = new Date(
                 data.sys.sunrise * 1000
               ).toLocaleTimeString();
-              document.getElementById("currentTime").innerHTML = new Date(
-                data.dt * 1000
-              ).toLocaleTimeString();
+
               document.getElementById("sunset").innerHTML = new Date(
                 data.sys.sunset * 1000
               ).toLocaleTimeString();
@@ -273,6 +271,14 @@
           updateWeatherInfo();
         };
 
+        const updateDateTime = () => {
+          var dt = new Date();
+          document.getElementById(
+            "currentTime"
+          ).innerHTML = dt.toLocaleString();
+          setTimeout(updateDateTime, 1000);
+        };
+
         const convertToCelcius = () => {
           unit = "°C";
           buttons[1].classList.remove("amber");
@@ -293,6 +299,7 @@
           .addEventListener("click", convertToCelcius);
         //script
         getUserLocation();
+        updateDateTime();
       });
     </script>
   </body>
